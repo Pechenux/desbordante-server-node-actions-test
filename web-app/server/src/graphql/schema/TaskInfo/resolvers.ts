@@ -657,7 +657,7 @@ export const TaskInfoResolvers: Resolvers = {
                     prefix: MainPrimitiveType;
                 }) || null;
             const state = await models.TaskState.findByPk(taskID, {
-                attributes: ["userID", "isPrivate"],
+                attributes: ["userID", "isPrivate", "createdAt"],
             });
             if (!taskConfig || !state) {
                 throw new UserInputError("Invalid taskID was provided", {

@@ -1,0 +1,10 @@
+@import "styles/common";
+
+.overviewTab {
+  display: flex;
+
+  .left {
+    max-width: 980px;
+    width: 100%;
+  }
+}

@@ -1,31 +1,67 @@
 import { gql } from '@apollo/client';
 
 export const GET_USER = gql`
-  query getUser($userID: ID!) {
-    user(userID: $userID) {
+  query getUser {
+    user {
       userID
       fullName
       email
       permissions
       accountStatus
-      datasets {
-        fileID
-        fileName
-        hasHeader
-        delimiter
-        supportedPrimitives
-        rowsCount
-        fileFormat {
-          inputFormat
-          tidColumnIndex
-          itemColumnIndex
-          hasTid
+      reservedDiskSpace
+      remainingDiskSpace
+      tasks(withDeleted: false) {
+        total
+        data {
+          taskID
+          state {
+            ... on TaskState {
+              user {
+                fullName
+              }
+              processStatus
+              phaseName
+              currentPhase
+              progress
+              maxPhase
+              isExecuted
+              elapsedTime
+              createdAt
+            }
+          }
+          data {
+            baseConfig {
+              algorithmName
+              type
+            }
+          }
+          dataset {
+            originalFileName
+          }
         }
-        countOfColumns
-        isBuiltIn
-        createdAt
-        originalFileName
-        numberOfUses
+      }
+      datasets(sort: { sortBy: FILE_SIZE, orderBy: DESC }) {
+        total
+        data {
+          fileID
+          fileName
+          hasHeader
+          delimiter
+          supportedPrimitives
+          rowsCount
+          fileSize
+          fileFormat {
+            inputFormat
+            tidColumnIndex
+            itemColumnIndex
+            hasTid
+          }
+          countOfColumns
+          isBuiltIn
+          createdAt
+          originalFileName
+          numberOfUses
+        }
       }
     }
   }

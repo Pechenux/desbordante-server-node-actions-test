@@ -6,6 +6,7 @@ import NavBar from '@components/NavBar';
 import { useAuthContext } from '@hooks/useAuthContext';
 import useModal from '@hooks/useModal';
 import styles from './Header.module.scss';
+import Link from 'next/link';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
@@ -43,7 +44,12 @@ const Header = () => {
       <div className={styles.auth}>
         {user?.name ? (
           <>
-            <p>Welcome, {user.name}</p>
+            <p>
+              Welcome,{' '}
+              <Link className={styles.userCabinetLink} href="/me">
+                {user.name}
+              </Link>
+            </p>
             {!user.isVerified && (
               <Button
                 variant="secondary"

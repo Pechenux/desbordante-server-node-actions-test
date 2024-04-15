@@ -61,6 +61,20 @@ const typeDefs = gql`
         sortBy: DatasetsSortBy!
     }
 
+    interface PaginatedAnswer {
+        total: Int!
+    }
+
+    type TasksAnswer implements PaginatedAnswer {
+        total: Int!
+        data: [TaskInfo!]
+    }
+
+    type DatasetsAnswer implements PaginatedAnswer {
+        total: Int!
+        data: [DatasetInfo!]
+    }
+
     type User {
         userID: String!
         feedbacks(pagination: Pagination! = { offset: 0, limit: 10 }): [Feedback!]
@@ -72,12 +86,15 @@ const typeDefs = gql`
         companyOrAffiliation: String!
         occupation: String!
         accountStatus: String!
-        tasks(pagination: Pagination!, withDeleted: Boolean! = False): [TaskInfo!]
+        tasks(
+            pagination: Pagination! = { offset: 0, limit: 10 }
+            withDeleted: Boolean! = False
+        ): TasksAnswer!
         datasets(
             filter: DatasetsFilter
             sort: DatasetsSort
             pagination: Pagination! = { offset: 0, limit: 10 }
-        ): [DatasetInfo!]
+        ): DatasetsAnswer!
         reservedDiskSpace: Int!
         remainingDiskSpace: Int!
     }
@@ -137,7 +154,7 @@ const typeDefs = gql`
     type InputFileConfig {
         allowedFileFormats: [String!]!
         allowedDelimiters: [String!]!
-        maxFileSize: Float!
+        userDiskLimit: Float!
     }
 
     type AlgorithmsConfig {
@@ -219,6 +236,7 @@ const typeDefs = gql`
         maxPhase: Int
         isExecuted: Boolean!
         elapsedTime: Float
+        createdAt: String!
     }
 
     union TaskStateAnswer = TaskState | ResourceLimitTaskError | InternalServerTaskError

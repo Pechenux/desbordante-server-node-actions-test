@@ -18,6 +18,7 @@ import { TaskState } from "../../../db/models/TaskData/TaskState";
 import config from "../../../config";
 import { createAndSendVerificationCode } from "./emailSender";
 import jwt from "jsonwebtoken";
+import sequelize from "sequelize";
 
 export const UserResolvers: Resolvers = {
     Role: {
@@ -63,7 +64,7 @@ export const UserResolvers: Resolvers = {
                 throw new ApolloError("UserID is undefined");
             }
 
-            const configs = await models.GeneralTaskConfig.findAll({
+            const { rows, count } = await models.GeneralTaskConfig.findAndCountAll({
                 where: { "$taskState.userID$": userID },
                 include: {
                     model: TaskState,
@@ -73,9 +74,13 @@ export const UserResolvers: Resolvers = {
                 ...pagination,
                 attributes: ["taskID", "fileID", ["type", "prefix"]],
             });
-            return configs as (GeneralTaskConfig & {
-                prefix: MainPrimitiveType;
-            })[];
+
+            return {
+                data: rows as (GeneralTaskConfig & {
+                    prefix: MainPrimitiveType;
+                })[],
+                total: count,
+            };
         },
         datasets: async ({ userID }, { filter, sort, pagination }, { models }) => {
             if (!userID) {
@@ -98,6 +103,7 @@ export const UserResolvers: Resolvers = {
                 };
             }
 
+            console.log({ sort });
             if (sort) {
                 const sortKey = {
                     ORIGINAL_FILE_NAME: "originalFileName",
@@ -107,12 +113,19 @@ export const UserResolvers: Resolvers = {
                 options.order = [[sortKey, sort.orderBy]];
             }
 
-            return await models.FileInfo.findAll({
+            const { rows, count } = await models.FileInfo.findAndCountAll({
+                ...options,
                 where: {
+                    ...options.where,
                     userID,
                     isValid: true,
                 },
             });
+
+            return {
+                data: rows,
+                total: count,
+            };
         },
     },
     Feedback: {

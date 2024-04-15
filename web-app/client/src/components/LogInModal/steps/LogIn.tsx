@@ -46,7 +46,7 @@ const LogIn: FC<Props> = ({ onSuccess, onRecovery }) => {
       const response = await logIn({
         variables: {
           email: values.email,
-          pwdHash: hashPassword(values.password),
+          pwdHash: values.password,
         },
       });
 
@@ -78,7 +78,7 @@ const LogIn: FC<Props> = ({ onSuccess, onRecovery }) => {
             placeholder="admin1234"
             {...register('password', {
               required: 'Required',
-              validate: (value) => isStrongPassword(value) || 'Weak password',
+              // validate: (value) => isStrongPassword(value) || 'Weak password',
             })}
             error={errors.password?.message}
           />
